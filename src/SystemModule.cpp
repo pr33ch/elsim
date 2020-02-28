@@ -7,6 +7,13 @@
 #include "Wire.h"
 #include "param.h"
 
+void SystemModule::visualize()
+{
+	write_graphviz(std::cout, g_,
+	            make_label_writer(get(&VertexProps::name, g_)),
+	            make_label_writer(get(&EdgeProps::name, g_)));
+}
+
 void SystemModule::reset()
 {
 	// reset all submodules
@@ -265,6 +272,9 @@ void SystemModule::submodule(Module* m)
 {
 	assert(m);
 	submodules_.insert(m);
+	vertex_t u = add_vertex(g_);
+	g_[u].name = m->classname_;
+	vertex_descriptor_of_[m->classname_] = u;
 #ifdef MOD_EXTRA
 	assert(!m->parent);
 	m->parent = this;

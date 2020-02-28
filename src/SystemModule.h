@@ -2,6 +2,13 @@
 #define SYSTEMMODULE_H_
 
 #include "Module.h"
+#include <boost/graph/adjacency_list.hpp>
+#include <boost/graph/graphviz.hpp>
+
+struct VertexProps { std::string name; };
+struct EdgeProps   { std::string name; };
+typedef boost::adjacency_list<boost::vecS, boost::vecS, boost::directedS, VertexProps, EdgeProps> Graph;
+typedef boost::graph_traits<Graph>::vertex_descriptor vertex_t;
 
 // A SystemModule is a Module which contains other Modules.
 // All cumulative delay/area/load/energy calculations are done here.
@@ -27,6 +34,12 @@ private:
 	// helper function adds energies for submodules
 	void recordEnergies(std::map<delay_t,energy_t>& energyTable) const;
 
+	// adjacency-list representation of circuit where modules are nodes of the graph
+	Graph g_;
+
+	// map module name to vertex descriptor
+	std::map<std::string, vertex_t> vertex_descriptor_of_;
+
 public:
 	// overridden from Module
 	bool isSystem() const { return true; }
@@ -49,6 +62,8 @@ public:
 	// overridden from Module
 	energy_t energy(int onum) const;
 
+	// export a dot file that visualizes the circuit via computational graph
+	void visualize(); // TO-DO: argument should be a custom path?
 protected:
 	// overridden from Module
 	void propagate();

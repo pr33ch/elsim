@@ -15,6 +15,7 @@ void testMultiplier(Rad4Multiplier12b& multiplier, value_t x, value_t y, Bit c)
 	cout << multiplier("Y") << endl;
 	multiplier("Ci") <= c;
 	cout << multiplier("Ci") << endl;
+	multiplier.visualize();
 	multiplier.simulate();
 	cout << x << " * " << y << " = " << "(" << multiplier("Co") << ")" << multiplier("P") << endl;
 
