@@ -40,6 +40,10 @@ private:
 	// map module name to vertex descriptor
 	std::map<std::string, vertex_t> vertex_descriptor_of_;
 
+	// an edge in the graph is uniquely defined by an input and output module and port
+	// map input and output modules and ports to edge descriptor
+	std::map<std::tuple<std::string, std::string, std::string, std::string>, edge_t> edge_descriptor_of_;
+
 public:
 	// overridden from Module
 	bool isSystem() const { return true; }
