@@ -1,0 +1,128 @@
+--------------------------------------------------
+Extensible Logic Simulator (ELSim) Documentation
+--------------------------------------------------
+Marco Vitanza             March 22, 2012
+--------------------------------------------------
+
+Directory contents:
+- README
+    This file.
+- Makefile
+    The makefile.
+- src/
+    The main simulator code.
+- test/
+    Test programs that use the simulator.
+  - adders.cpp
+      Simulate all the built-in adder types.
+      Various statistics are reported.
+      X,Y,Carry inputs are specified as command-line arguments.
+  - addtests.cpp
+      Test adders of various types and sizes with several random inputs.
+  - addtests2.cpp
+      Test various types of 64-bit adders with several random inputs.
+  - prefix8to128.cpp
+      Test prefix adders from size 8 to 128 bits.
+  - cla8to128.cpp
+      Test lookahead adders from size 8 to 128 bits.
+  - perftest.cpp
+      Simulator performance test.
+      Simulates a binary tree of random 2-input gates.
+      The number of tree levels is specified as a command-line argument.
+
+--------------------------------------------------
+Build instructions:
+  1) Set the makefile variable $MAINSRC to your desired top-level source file
+     (containing main()). You can just uncomment one of the existing lines.
+     The default top-level file is "test/adders.cpp".
+  2) Run `make`.
+
+Other build options:
+  - `make debug` to include debugging printouts.
+  - `make opt` to compile with optimization and turn off all debug features.
+  - `make clean` to remove the simulator executable.
+
+To run: `./elsim <args>`
+
+--------------------------------------------------
+Creating a simulation
+--------------------------------------------------
+
+See "test/adders.cpp" for an example.
+You should include "sim.h" to have access to all the built-in modules.
+The general steps are: declare a top-level module, set its inputs, and call its
+simulate() method. Then print the outputs or write a VCD file using VCDWriter.
+
+--------------------------------------------------
+Built-in modules
+--------------------------------------------------
+
+This list is not exhaustive. See "src/sim.h".
+
+The following classes derive from Module:
+- AND,NAND,OR,NOR,XOR,XNOR,INV,BUF
+    Standard logic gates with arbitrary number of inputs.
+- FA,HA,GAP
+    Full adder, half adder, generate-alive-propagate.
+- MUX
+    Multiplexer with two arbitrary-width inputs.
+- CLK,REG,LATCH
+    Clock pulse generator, register, transparent latch.
+
+The following classes derive from SystemModule:
+- MetaGate
+    Composite gate with arbitrary-width inputs.
+    e.g. MetaGate<AND>(4,2) is an AND gate with four 2-bit inputs.
+- LookaheadGenerator
+    Computes all generate and propagate signals for 2 arbitrary-width inputs.
+- SaveAdder
+    Carry-save adder.
+
+The following classes derive from Adder:
+- RippleAdder
+    Carry-ripple adder. Sub-adders can be any Adder (default is 1-bit FAs).
+- SkipAdder
+    Carry-skip adder. Sub-adders can be any Adder that provides a P output.
+- SelectAdder
+    Carry-select adder. Sub-adders can be any Adder.
+- LookaheadAdder
+    Carry-lookahead adder. Sub-adders can be any Adder that provides G and P.
+- PrefixAdder
+    Prefix adder using Kogge-Stone design.
+
+--------------------------------------------------
+Creating a custom module
+--------------------------------------------------
+
+If you want to create a black-box module to completely specify its behavior,
+then derive from class Module.
+
+You should implement the following methods:
+ - Constructor, where you set `classname_` and define inputs and outputs.
+ - propagate()
+ - delay_t delay(int,int)
+You may optionally define these methods:
+ - delay_t load(int)
+ - area_t area()
+ - energy_t energy(int)
+See "src/HA.h" for an example.
+
+If you want to create a hierarchical module that contains sub-modules, then 
+derive from class SystemModule. All you need to implement is a constructor, 
+which defines inputs and outputs, and creates and connects sub-modules. 
+See "src/FullAdder.h" for an example.
+
+If you want to create an standard adder module, then derive from class Adder.
+The inputs X, Y, and Ci, and outputs S and Co, will be defined for you.
+You should implement a constructor as before, along with the clone() method.
+This is so other adders can make copies of your adder to use as sub-modules.
+
+--------------------------------------------------
+Changing built-in parameters
+--------------------------------------------------
+
+The parameters for the standard logic gate classes are in "src/param.h".
+Classes such as AND/OR/XOR as well as HA/FA use these parameters.
+The parameter types are: delay, load-factor, area, energy.
+Currently delays are integer values.
+Area and energy are floating-point.
