@@ -9,6 +9,7 @@ struct VertexProps { std::string name; };
 struct EdgeProps   { std::string name; };
 typedef boost::adjacency_list<boost::vecS, boost::vecS, boost::directedS, VertexProps, EdgeProps> Graph;
 typedef boost::graph_traits<Graph>::vertex_descriptor vertex_t;
+typedef boost::graph_traits<Graph>::edge_descriptor edge_t;
 
 // A SystemModule is a Module which contains other Modules.
 // All cumulative delay/area/load/energy calculations are done here.
