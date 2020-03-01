@@ -2,14 +2,9 @@
 #define SYSTEMMODULE_H_
 
 #include "Module.h"
+#include "EdgeProperties.h"
 #include <boost/graph/adjacency_list.hpp>
 #include <boost/graph/graphviz.hpp>
-
-struct VertexProps { std::string name; };
-struct EdgeProps   { std::string name; };
-typedef boost::adjacency_list<boost::vecS, boost::vecS, boost::directedS, VertexProps, EdgeProps> Graph;
-typedef boost::graph_traits<Graph>::vertex_descriptor vertex_t;
-typedef boost::graph_traits<Graph>::edge_descriptor edge_t;
 
 // A SystemModule is a Module which contains other Modules.
 // All cumulative delay/area/load/energy calculations are done here.
@@ -41,9 +36,11 @@ private:
 	// map module name to vertex descriptor
 	std::map<std::string, vertex_t> vertex_descriptor_of_;
 
-	// an edge in the graph is uniquely defined by an input and output module and port
-	// map input and output modules and ports to edge descriptor
-	std::map<std::tuple<std::string, std::string, std::string, std::string>, edge_t> edge_descriptor_of_;
+	// an edge in the graph is uniquely defined by input and output modules + ports
+	// map <output module name, output port name, input module name, input port name>to edge property
+	std::map<std::tuple<std::string, std::string, std::string, std::string>, EdgeProperties*> edge_properties_of_components_;
+	std::map<edge_t, EdgeProperties*> edge_properties_of_descriptor_;
+
 
 public:
 	// overridden from Module

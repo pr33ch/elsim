@@ -15,7 +15,7 @@ void testAdder(Adder& adder, value_t x, value_t y, Bit c)
 
 	// print the adder name
 	cout << adder << endl;;
-
+	adder.visualize();
 	// print the results and the times
 	cout << x << " + " << y << " + " << c << " = " << "(" << adder("Co") << ")" << adder("S") << endl;
 	cout << "Sum   at T = " << adder.lastTime("S")  << endl;
