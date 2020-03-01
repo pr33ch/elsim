@@ -13,19 +13,15 @@ class EdgeProperties
 {
 	public:
 		// // constructor
-		EdgeProperties(std::string source_port, std::string dest_port, int source_i, int source_j, int dest_i, int dest_j);
+		EdgeProperties(std::string source_port, std::string dest_port);
 
 		// source and destination ports
 		std::string source_port_;
 		std::string dest_port_;
 
-		// bit positions i through j for source port, inclusive
-		int si_;
-		int sj_;
-
-		// bit positions i through j for dest port, inclusive
-		int di_;
-		int dj_;
+		// source_bit_positions_[i] is connected to dest_bit_positions[i]
+		std::vector<int> source_bit_positions_;
+		std::vector<int> dest_bit_positions_;
 
 		// time stamp at which signals arrive at dest
 		int t_ = 0;
@@ -35,6 +31,9 @@ class EdgeProperties
 
 		// returns the string representation of the edge properties
 		std::string to_str();
+
+		// define a new bit position connection from source_port_ to dest_port. Modifies the bit position vectors
+		void define_bit_position_connections(int source, int dest);
 };
 
 #endif //EDGEPROPERTIES_H_
