@@ -18,14 +18,14 @@ void SystemModule::visualize()
 void SystemModule::connect_submodule_vertices()
 {
  
-	// Iterate over the map using c++11 range based for loop
-	for (std::pair<Module*, vertex_t> element : vertex_descriptor_of_) {
-		// Accessing KEY from element
-		std::cout << "Module Address: "<< element.first << " maps to: ";
-		// Accessing VALUE from element.
-		std::cout << "Vertex Descriptor: "<< element.second << std::endl;
-	}
-	std::cout << "Making module connections... " << std::endl;
+	// // Iterate over the map using c++11 range based for loop
+	// for (std::pair<Module*, vertex_t> element : vertex_descriptor_of_) {
+	// 	// Accessing KEY from element
+	// 	std::cout << "Module Address: "<< element.first << " maps to: ";
+	// 	// Accessing VALUE from element.
+	// 	std::cout << "Vertex Descriptor: "<< element.second << std::endl;
+	// }
+	// std::cout << "Making module connections... " << std::endl;
 	for (auto src_module : submodules_)
 	{
 		for(int onum = 0; onum < src_module->numOutputs(); onum++) // output ports
@@ -36,12 +36,12 @@ void SystemModule::connect_submodule_vertices()
 				{
 					int src_port_num = onum;
 					std::string src_port_name = src_module->nameOfOutput(src_port_num).name;
-					std::cout << "Source module: "<< src_module << " port " << src_port_name << " connects with ";
+					// std::cout << "Source module: "<< src_module << " port " << src_port_name << " connects with ";
 
 					Module* dest_module = dest.first;
 					int dest_port_num = dest.second;
 					std::string dest_port_name = dest.first->nameOfInput(dest_port_num).name;
-					std::cout << "Dest module: " << dest_module << " port " << dest_port_name << std::endl;
+					// std::cout << "Dest module: " << dest_module << " port " << dest_port_name << std::endl;
 
 					std::tuple<Module*, std::string, Module*, std::string> key = std::make_tuple(src_module, src_port_name, dest_module, dest_port_name);
 
