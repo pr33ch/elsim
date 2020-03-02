@@ -9,9 +9,58 @@
 
 void SystemModule::visualize()
 {
+	connect_submodule_vertices();
 	write_graphviz(std::cout, g_,
 	            make_label_writer(get(&VertexProps::name, g_)),
 	            make_label_writer(get(&EdgeProps::name, g_)));
+}
+
+void SystemModule::connect_submodule_vertices()
+{
+ 
+	// Iterate over the map using c++11 range based for loop
+	for (std::pair<Module*, vertex_t> element : vertex_descriptor_of_) {
+		// Accessing KEY from element
+		std::cout << "Module Address: "<< element.first << " maps to: ";
+		// Accessing VALUE from element.
+		std::cout << "Vertex Descriptor: "<< element.second << std::endl;
+	}
+	std::cout << "Making module connections... " << std::endl;
+	for (auto src_module : submodules_)
+	{
+		for(int onum = 0; onum < src_module->numOutputs(); onum++) // output ports
+		{
+			if (src_module->local_connections_.count(onum) != 0)
+			{
+				for (auto dest : src_module->local_connections_[onum])
+				{
+					int src_port_num = onum;
+					std::string src_port_name = src_module->nameOfOutput(src_port_num).name;
+					std::cout << "Source module: "<< src_module << " port " << src_port_name << " connects with ";
+
+					Module* dest_module = dest.first;
+					int dest_port_num = dest.second;
+					std::string dest_port_name = dest.first->nameOfInput(dest_port_num).name;
+					std::cout << "Dest module: " << dest_module << " port " << dest_port_name << std::endl;
+
+					std::tuple<Module*, std::string, Module*, std::string> key = std::make_tuple(src_module, src_port_name, dest_module, dest_port_name);
+
+					if (edge_properties_of_components_.count(key) == 0)
+					{
+						auto e = add_edge(vertex_descriptor_of_[src_module], vertex_descriptor_of_[dest_module], {"unset properties"}, g_).first;
+
+						EdgeProperties* ep = new EdgeProperties(src_port_name, dest_port_name);
+						edge_properties_of_descriptor_[e] = ep;
+						edge_properties_of_components_[key] = ep;
+					}
+					else
+					{
+						edge_properties_of_components_[key]->define_bit_position_connection(src_port_num, dest_port_num);
+					}
+				}
+			}
+		}
+	}
 }
 
 void SystemModule::reset()
@@ -79,6 +128,35 @@ std::cout << "connect " << *this << " output " << onum << " to " << *other << " 
 		assert(!w2->hasWriter());
 		other->mergeInputWire(inum, w1);
 	}
+
+	local_connections_[onum].push_back(PORT_T(other, inum));
+	// for (std::pair<Module*, vertex_t> element : vertex_descriptor_of_) {
+	// 	// Accessing KEY from element
+	// 	std::cout << "Module Address: "<< element.first << " maps to: ";
+	// 	// Accessing VALUE from element.
+	// 	std::cout << "Vertex Descriptor: "<< element.second << std::endl;
+	// }
+
+	// std::cout << "connect " << this << " output " << onum << " to " << other << " input " << inum << std::endl;
+	// std::string src_port_name = this->nameOfOutput(onum).name;
+
+	// std::string dest_port_name = other->nameOfInput(inum).name;
+
+	// std::tuple<Module*, std::string, Module*, std::string> key = std::make_tuple(this, src_port_name, other, dest_port_name);
+	// // std::cout << "count of key: " << edge_properties_of_components_.count(key) << std::endl;
+	// if (edge_properties_of_components_.count(key) == 0)
+	// {
+	// 	std::cout << "new edge: " <<vertex_descriptor_of_[this] << "->" << vertex_descriptor_of_[other] << std::endl;
+	// 	auto e = add_edge(vertex_descriptor_of_[this], vertex_descriptor_of_[other], {"unset properties"}, g_).first;
+
+	// 	EdgeProperties* ep = new EdgeProperties(src_port_name, dest_port_name);
+	// 	edge_properties_of_descriptor_[e] = ep;
+	// 	edge_properties_of_components_[key] = ep;
+	// }
+	// else
+	// {
+	// 	edge_properties_of_components_[key]->define_bit_position_connection(onum, inum);
+	// }
 }
 
 void SystemModule::mergeInputWire(int inum, Wire* w)
@@ -274,7 +352,7 @@ void SystemModule::submodule(Module* m)
 	submodules_.insert(m);
 	vertex_t u = add_vertex(g_);
 	g_[u].name = m->classname_;
-	vertex_descriptor_of_[m->classname_] = u;
+	vertex_descriptor_of_[m] = u;
 #ifdef MOD_EXTRA
 	assert(!m->parent);
 	m->parent = this;

@@ -9,7 +9,7 @@ MAINSRC := test/adders.cpp
 # MAINSRC := test/mult_test.cpp
 # MAINSRC := test/multgen_test.cpp
 
-SRC := src/Bit.cpp src/BitVector.cpp src/Module.cpp src/SystemModule.cpp
+SRC := src/Bit.cpp src/BitVector.cpp src/Module.cpp src/SystemModule.cpp src/EdgeProperties.cpp
 
 SIM := elsim
 

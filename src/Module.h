@@ -223,6 +223,10 @@ public:
 	// continue an existing simulation
 	static void simStep(delay_t steps=DELAY_T_MAX);
 
+	// maintain a record of the input and output connections of the module
+	// key is this module's onum port and value is a vector of the destination PORT_T's
+	std::map<int, std::vector<std::pair<Module*,int>>> local_connections_;
+
 private:
 	// Called by setOutput() when a wire value changed.
 	// During simulation, this will add items to the sim queue.

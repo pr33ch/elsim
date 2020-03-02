@@ -33,7 +33,7 @@ class EdgeProperties
 		std::string to_str();
 
 		// define a new bit position connection from source_port_ to dest_port. Modifies the bit position vectors
-		void define_bit_position_connections(int source, int dest);
+		void define_bit_position_connection(int source, int dest);
 };
 
 #endif //EDGEPROPERTIES_H_

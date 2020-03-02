@@ -34,13 +34,15 @@ private:
 	Graph g_;
 
 	// map module name to vertex descriptor
-	std::map<std::string, vertex_t> vertex_descriptor_of_;
+	std::map<Module*, vertex_t> vertex_descriptor_of_;
 
-	// an edge in the graph is uniquely defined by input and output modules + ports
-	// map <output module name, output port name, input module name, input port name>to edge property
-	std::map<std::tuple<std::string, std::string, std::string, std::string>, EdgeProperties*> edge_properties_of_components_;
+	// an edge in the graph is uniquely defined by source and destination modules + ports
+	// map <source module, source port name, destination module, destination port name>to edge property
+	std::map<std::tuple<Module*, std::string, Module*, std::string>, EdgeProperties*> edge_properties_of_components_;
 	std::map<edge_t, EdgeProperties*> edge_properties_of_descriptor_;
 
+	// connect vertices of system module submodules
+	void connect_submodule_vertices();
 
 public:
 	// overridden from Module
@@ -66,6 +68,7 @@ public:
 
 	// export a dot file that visualizes the circuit via computational graph
 	void visualize(); // TO-DO: argument should be a custom path?
+
 protected:
 	// overridden from Module
 	void propagate();
