@@ -145,6 +145,10 @@ void Module::defineOutput(const std::string& name, int i)
 
 void Module::addInput(const std::string& name, int N)
 {
+	vertex_t u = add_vertex(g_);
+	g_[u].name = name;
+	iovertex_descriptor_of_[name] = u;
+
 	int Nin = numInputs();
 	addInputs(N);
 	defineInput(name, Nin+N-1, Nin);
@@ -152,6 +156,10 @@ void Module::addInput(const std::string& name, int N)
 
 void Module::addOutput(const std::string& name, int N)
 {
+	vertex_t u = add_vertex(g_);
+	g_[u].name = name;
+	iovertex_descriptor_of_[name] = u;
+	
 	int Nout = numOutputs();
 	addOutputs(N);
 	defineOutput(name, Nout+N-1, Nout);

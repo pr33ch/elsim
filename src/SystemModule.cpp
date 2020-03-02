@@ -190,8 +190,6 @@ void SystemModule::connectSystemInput(int i, Module* m, int inum)
 std::cout << "system " << *this << " input" << i << " " << nameOfInput(i) << " goes to "
           << *m << " input" << inum << " " << m->nameOfInput(inum) << std::endl;
 #endif
-
-	// connect system input i with module input
 	Wire* w1 = inWires_[i];
 	Wire* w2 = m->inWires_[inum];
 
@@ -229,6 +227,10 @@ std::cout << "w2 has writer! " << *(w2->getWriter().first) << std::endl;
 		assert(!w2->hasWriter());
 		m->mergeInputWire(inum, w1);
 	}
+
+	// update graph representation of circuit
+	std::string label = "SRC: " + nameOfInput(i).name + "[" + std::to_string(i) + "]\n" + "DEST: " + m->nameOfInput(inum).name + "[" + std::to_string(inum) + "]\n" + "T: 0";
+	add_edge(iovertex_descriptor_of_[nameOfInput(i).name], vertex_descriptor_of_[m], {label}, g_);
 }
 
 // can only be called once for a given i!
@@ -260,6 +262,10 @@ std::cout << "system " << *this << " output" << i << " " << nameOfOutput(i) << "
 		// other wire exists but ours doesn't
 		outWires_[i] = w2->retain();
 	}
+
+	//update the graph representation of the circuit
+	std::string label = "SRC: " + m->nameOfOutput(onum).name + "[" + std::to_string(onum) + "]\n" + "DEST: " + nameOfOutput(i).name + "[" + std::to_string(i) + "]\n" + "T: 0";
+	add_edge(vertex_descriptor_of_[m], iovertex_descriptor_of_[nameOfOutput(i).name], {label}, g_);
 }
 
 void operator<<(const Port& p1, const Port& p2)

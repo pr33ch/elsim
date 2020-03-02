@@ -12,6 +12,7 @@
 
 #include "BitHistory.h"
 #include "BitVector.h"
+#include "EdgeProperties.h"
 
 class Wire;		// Wire.h
 struct Port;	// this file
@@ -52,6 +53,12 @@ private:
 	static delay_t simtime;
 
 protected:
+
+	// adjacency-list representation of circuit where modules are nodes of the graph
+	Graph g_;
+	// map input/output names to vertex descriptor
+	std::map<std::string, vertex_t> iovertex_descriptor_of_;
+	
 	// uniquely identifies class+configuration
 	// must be set by subclasses
 	std::string classname_;

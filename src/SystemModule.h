@@ -30,10 +30,7 @@ private:
 	// helper function adds energies for submodules
 	void recordEnergies(std::map<delay_t,energy_t>& energyTable) const;
 
-	// adjacency-list representation of circuit where modules are nodes of the graph
-	Graph g_;
-
-	// map module name to vertex descriptor
+	// map module to vertex descriptor
 	std::map<Module*, vertex_t> vertex_descriptor_of_;
 
 	// an edge in the graph is uniquely defined by source and destination modules + ports
