@@ -41,6 +41,9 @@ private:
 	// connect vertices of system module submodules
 	void connect_submodule_vertices();
 
+	// label the connections between modules in the graph visualization
+	void label_edges();
+
 public:
 	// overridden from Module
 	bool isSystem() const { return true; }

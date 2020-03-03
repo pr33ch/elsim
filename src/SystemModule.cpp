@@ -10,9 +10,32 @@
 void SystemModule::visualize()
 {
 	connect_submodule_vertices();
+	// TO-DO: method for updating time delays -- BFS
+	// TO-DO: method for highlighting cricial path -- DFS
+	label_edges();
 	write_graphviz(std::cout, g_,
 	            make_label_writer(get(&VertexProps::name, g_)),
-	            make_label_writer(get(&EdgeProps::name, g_)));
+	            make_label_writer(get(&EdgeProps::label, g_)));
+}
+
+void SystemModule::label_edges()
+{
+
+	// iterate through each vertex
+	boost::graph_traits<Graph>::vertex_iterator vi, vi_end, next;
+	boost::tie(vi, vi_end) = vertices(g_);
+	for (next = vi; vi != vi_end; vi = next) {
+
+		// iterate through each edge for each vertex
+		boost::graph_traits < Graph >::out_edge_iterator ei, ei_end;
+		for (boost::tie(ei, ei_end) = out_edges(*next, g_); ei != ei_end; ++ei) {
+			if (edge_properties_of_descriptor_.count(*ei) != 0)
+			{
+				g_[*ei].label = edge_properties_of_descriptor_[*ei]->to_str();
+			}
+		}
+		++next;
+	}
 }
 
 void SystemModule::connect_submodule_vertices()
@@ -50,6 +73,7 @@ void SystemModule::connect_submodule_vertices()
 						auto e = add_edge(vertex_descriptor_of_[src_module], vertex_descriptor_of_[dest_module], {"unset properties"}, g_).first;
 
 						EdgeProperties* ep = new EdgeProperties(src_port_name, dest_port_name);
+						ep->define_bit_position_connection(src_port_num, dest_port_num);
 						edge_properties_of_descriptor_[e] = ep;
 						edge_properties_of_components_[key] = ep;
 					}
@@ -130,33 +154,6 @@ std::cout << "connect " << *this << " output " << onum << " to " << *other << " 
 	}
 
 	local_connections_[onum].push_back(PORT_T(other, inum));
-	// for (std::pair<Module*, vertex_t> element : vertex_descriptor_of_) {
-	// 	// Accessing KEY from element
-	// 	std::cout << "Module Address: "<< element.first << " maps to: ";
-	// 	// Accessing VALUE from element.
-	// 	std::cout << "Vertex Descriptor: "<< element.second << std::endl;
-	// }
-
-	// std::cout << "connect " << this << " output " << onum << " to " << other << " input " << inum << std::endl;
-	// std::string src_port_name = this->nameOfOutput(onum).name;
-
-	// std::string dest_port_name = other->nameOfInput(inum).name;
-
-	// std::tuple<Module*, std::string, Module*, std::string> key = std::make_tuple(this, src_port_name, other, dest_port_name);
-	// // std::cout << "count of key: " << edge_properties_of_components_.count(key) << std::endl;
-	// if (edge_properties_of_components_.count(key) == 0)
-	// {
-	// 	std::cout << "new edge: " <<vertex_descriptor_of_[this] << "->" << vertex_descriptor_of_[other] << std::endl;
-	// 	auto e = add_edge(vertex_descriptor_of_[this], vertex_descriptor_of_[other], {"unset properties"}, g_).first;
-
-	// 	EdgeProperties* ep = new EdgeProperties(src_port_name, dest_port_name);
-	// 	edge_properties_of_descriptor_[e] = ep;
-	// 	edge_properties_of_components_[key] = ep;
-	// }
-	// else
-	// {
-	// 	edge_properties_of_components_[key]->define_bit_position_connection(onum, inum);
-	// }
 }
 
 void SystemModule::mergeInputWire(int inum, Wire* w)
@@ -271,12 +268,10 @@ std::cout << "system " << *this << " output" << i << " " << nameOfOutput(i) << "
 	//update the graph representation of the circuit
 	if ((m->nameOfOutput(onum)).name.length() != 0) // for some reason, there are cases when the module port name is blank. Don't add an edge if this happens
 	{
-		// int dWidth = (*this)(nameOfOutput(i).name).width(); // bit width of dest port
-		// int sWidth = (*m)((m->nameOfOutput(onum)).name).width(); // bit width of source port
-		// std::string label = "SRC: " + m->nameOfOutput(onum).name + "[" + std::to_string(onum%sWidth) + "]\n" + "DEST: " + nameOfOutput(i).name + "[" + std::to_string(i%dWidth) + "]\n" + "T: 0";
-
 		auto e = add_edge(vertex_descriptor_of_[m], iovertex_descriptor_of_[nameOfOutput(i).name], {"unset properties"}, g_).first;
-		edge_properties_of_descriptor_[e] = new EdgeProperties((m->nameOfOutput(onum)).name, nameOfOutput(i).name);
+		EdgeProperties* ep = new EdgeProperties((m->nameOfOutput(onum)).name, nameOfOutput(i).name);
+		ep->define_bit_position_connection(onum, i);
+		edge_properties_of_descriptor_[e] = ep;
 	}
 }
 

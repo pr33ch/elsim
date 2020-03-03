@@ -5,7 +5,7 @@
 #include <boost/graph/graphviz.hpp>
 
 struct VertexProps { std::string name; };
-struct EdgeProps   { std::string name; };
+struct EdgeProps   { std::string label; };
 typedef boost::adjacency_list<boost::vecS, boost::vecS, boost::directedS, VertexProps, EdgeProps> Graph;
 typedef boost::graph_traits<Graph>::vertex_descriptor vertex_t;
 typedef boost::graph_traits<Graph>::edge_descriptor edge_t;
@@ -31,6 +31,8 @@ class EdgeProperties
 
 		// returns the string representation of the edge properties
 		std::string to_str();
+
+		void normalize_bit_positions();
 
 		// define a new bit position connection from source_port_ to dest_port. Modifies the bit position vectors
 		void define_bit_position_connection(int source, int dest);
