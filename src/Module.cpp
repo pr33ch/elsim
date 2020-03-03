@@ -678,6 +678,8 @@ void Module::connect(int onum, Module* other, int inum)
 		assert(w2->numReaders() == 1);
 		other->mergeInputWire(inum, w1);
 	}
+
+	local_connections_[onum].push_back(PORT_T(other, inum));
 }
 
 ////////////////////////////////////////////////////////////
