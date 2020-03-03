@@ -228,9 +228,10 @@ std::cout << "w2 has writer! " << *(w2->getWriter().first) << std::endl;
 	// update graph representation of circuit
 	if (m->nameOfInput(inum).name.length() != 0)
 	{
-		int sWidth = (*this)(nameOfInput(i).name).width(); // bit width of source port
-		int dWidth = (*m)(m->nameOfInput(inum).name).width();
-		std::string label = "SRC: " + nameOfInput(i).name + "[" + std::to_string(i%sWidth) + "]\n" + "DEST: " + m->nameOfInput(inum).name + "[" + std::to_string(inum%dWidth) + "]\n" + "T: 0";
+		// int sWidth = (*this)(nameOfInput(i).name).width(); // bit width of source port
+		// int dWidth = (*m)(m->nameOfInput(inum).name).width();
+		// std::string label = "SRC: " + nameOfInput(i).name + "[" + std::to_string(i%sWidth) + "]\n" + "DEST: " + m->nameOfInput(inum).name + "[" + std::to_string(inum%dWidth) + "]\n" + "T: 0";
+		std::string label = "SRC: " + nameOfInput(i).name + "[" + std::to_string(i) + "]\n" + "DEST: " + m->nameOfInput(inum).name + "[" + std::to_string(inum) + "]\n" + "T: 0";
 		add_edge(iovertex_descriptor_of_[nameOfInput(i).name], vertex_descriptor_of_[m], {label}, g_);
 	}
 }

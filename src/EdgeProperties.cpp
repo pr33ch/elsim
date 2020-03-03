@@ -31,7 +31,7 @@ void EdgeProperties::normalize_bit_positions()
 
 std::string EdgeProperties::to_str()
 {	
-	normalize_bit_positions();
+	// normalize_bit_positions();
 	std::ostringstream sbp; 
 	if (!source_bit_positions_.empty()) 
 	{ 
