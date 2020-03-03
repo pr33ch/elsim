@@ -271,11 +271,12 @@ std::cout << "system " << *this << " output" << i << " " << nameOfOutput(i) << "
 	//update the graph representation of the circuit
 	if ((m->nameOfOutput(onum)).name.length() != 0) // for some reason, there are cases when the module port name is blank. Don't add an edge if this happens
 	{
-		int dWidth = (*this)(nameOfOutput(i).name).width(); // bit width of dest port
-		int sWidth = (*m)((m->nameOfOutput(onum)).name).width(); // bit width of source port
+		// int dWidth = (*this)(nameOfOutput(i).name).width(); // bit width of dest port
+		// int sWidth = (*m)((m->nameOfOutput(onum)).name).width(); // bit width of source port
 		// std::string label = "SRC: " + m->nameOfOutput(onum).name + "[" + std::to_string(onum%sWidth) + "]\n" + "DEST: " + nameOfOutput(i).name + "[" + std::to_string(i%dWidth) + "]\n" + "T: 0";
 
-		add_edge(vertex_descriptor_of_[m], iovertex_descriptor_of_[nameOfOutput(i).name], {"unset properties"}, g_);
+		auto e = add_edge(vertex_descriptor_of_[m], iovertex_descriptor_of_[nameOfOutput(i).name], {"unset properties"}, g_).first;
+		edge_properties_of_descriptor_[e] = new EdgeProperties((m->nameOfOutput(onum)).name, nameOfOutput(i).name);
 	}
 }
 
