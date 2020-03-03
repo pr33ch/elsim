@@ -229,8 +229,13 @@ std::cout << "w2 has writer! " << *(w2->getWriter().first) << std::endl;
 	}
 
 	// update graph representation of circuit
-	std::string label = "SRC: " + nameOfInput(i).name + "[" + std::to_string(i) + "]\n" + "DEST: " + m->nameOfInput(inum).name + "[" + std::to_string(inum) + "]\n" + "T: 0";
-	add_edge(iovertex_descriptor_of_[nameOfInput(i).name], vertex_descriptor_of_[m], {label}, g_);
+	if (m->nameOfInput(inum).name.length() != 0)
+	{
+		int sWidth = (*this)(nameOfInput(i).name).width(); // bit width of source port
+		int dWidth = (*m)(m->nameOfInput(inum).name).width();
+		std::string label = "SRC: " + nameOfInput(i).name + "[" + std::to_string(i%sWidth) + "]\n" + "DEST: " + m->nameOfInput(inum).name + "[" + std::to_string(inum%dWidth) + "]\n" + "T: 0";
+		add_edge(iovertex_descriptor_of_[nameOfInput(i).name], vertex_descriptor_of_[m], {label}, g_);
+	}
 }
 
 // can only be called once for a given i!
@@ -264,8 +269,14 @@ std::cout << "system " << *this << " output" << i << " " << nameOfOutput(i) << "
 	}
 
 	//update the graph representation of the circuit
-	std::string label = "SRC: " + m->nameOfOutput(onum).name + "[" + std::to_string(onum) + "]\n" + "DEST: " + nameOfOutput(i).name + "[" + std::to_string(i) + "]\n" + "T: 0";
-	add_edge(vertex_descriptor_of_[m], iovertex_descriptor_of_[nameOfOutput(i).name], {label}, g_);
+	if ((m->nameOfOutput(onum)).name.length() != 0) // for some reason, there are cases when the module port name is blank. Don't add an edge if this happens
+	{
+		int dWidth = (*this)(nameOfOutput(i).name).width(); // bit width of dest port
+		int sWidth = (*m)((m->nameOfOutput(onum)).name).width(); // bit width of source port
+		// std::string label = "SRC: " + m->nameOfOutput(onum).name + "[" + std::to_string(onum%sWidth) + "]\n" + "DEST: " + nameOfOutput(i).name + "[" + std::to_string(i%dWidth) + "]\n" + "T: 0";
+
+		add_edge(vertex_descriptor_of_[m], iovertex_descriptor_of_[nameOfOutput(i).name], {"unset properties"}, g_);
+	}
 }
 
 void operator<<(const Port& p1, const Port& p2)
