@@ -30,6 +30,10 @@ private:
 	// helper function adds energies for submodules
 	void recordEnergies(std::map<delay_t,energy_t>& energyTable) const;
 	
+	// vector of edges that define the circuit's critical path
+	std::vector<edge_t> critical_path_edges_;
+	delay_t max_delay_ = 0; // only used for critical path delay analysis of graph representation of circuit 
+
 	// map edges connecting root nodes to destination module port numbers
 	std::map<edge_t, std::vector<int>> system_input_destination_ports_of_;
 
@@ -54,7 +58,7 @@ private:
 	void label_edges();
 
 	// set all the timestamps in the graphical representation of the circuit
-	void timestamps_dfs(vertex_t node, std::map<vertex_t, bool> path, int t, std::vector<int> inums);
+	void timestamps_dfs(vertex_t node, std::map<vertex_t, bool> path, std::vector<edge_t> &edge_path, int t, std::vector<int> inums);
 
 public:
 	// overridden from Module

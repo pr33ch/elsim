@@ -10,16 +10,15 @@
 void SystemModule::visualize()
 {
 	connect_submodule_vertices();
-	//update time delays via DFS through g_
+	//update time delays via DFS through g_, find critical path edges along the way
 	update_graph_timestamps();
-	// TO-DO: method for highlighting cricial path -- DFS
-	label_edges();
+	label_edges(); // label + color edges
 	write_graphviz(std::cout, g_,
 	            make_label_writer(get(&VertexProps::name, g_)),
-	            make_label_writer(get(&EdgeProps::label, g_)));
+	            my_edge_property_writer( g_));
 }
 
-void SystemModule::timestamps_dfs(vertex_t node, std::map<vertex_t, bool> path, int t, std::vector<int> inums)
+void SystemModule::timestamps_dfs(vertex_t node, std::map<vertex_t, bool> path, std::vector<edge_t> &edge_path, int t, std::vector<int> inums)
 {
 
 	// std::cout << t << std::endl;
@@ -63,14 +62,26 @@ void SystemModule::timestamps_dfs(vertex_t node, std::map<vertex_t, bool> path, 
 					// std::cout << ep->t_ << std::endl;
 				}
 				// recursively do this for the destination node
-				timestamps_dfs(target, path, max_dt+t, ep->dest_bit_positions_);
+				edge_path.push_back(*ei);
+				timestamps_dfs(target, path, edge_path, max_dt+t, ep->dest_bit_positions_);
+				edge_path.pop_back();
 			}
 			else
 			{
-				timestamps_dfs(target, path, 0, system_input_destination_ports_of_[*ei]);
+				edge_path.push_back(*ei);
+				timestamps_dfs(target, path, edge_path, 0, system_input_destination_ports_of_[*ei]);
+				edge_path.pop_back();
 			}
 		}
 		path[node] = false; // backtrack our visit
+	}
+	else // we've reached a leaf node
+	{
+		if(t > max_delay_)
+		{
+			max_delay_ = t;
+			critical_path_edges_ = edge_path;
+		}
 	}
 }
 
@@ -88,14 +99,9 @@ void SystemModule::update_graph_timestamps()
 
 	for (auto& root : root_vertices_)
 	{	
-		// int inWidth = module_of_descriptor_[root]->numInputs();
-		// std::cout << inWidth << std::endl;
 		std::vector<int> inums;
-		// for (int i = 0; i < inWidth; i++)
-		// {
-		// 	 inums.push_back(i);
-		// }
-		timestamps_dfs(root, path, 0, inums);
+		std::vector<edge_t> edge_path;
+		timestamps_dfs(root, path, edge_path, 0, inums);
 	}
 }
 
@@ -116,6 +122,11 @@ void SystemModule::label_edges()
 			}
 		}
 		++next;
+	}
+
+	for (auto ei : critical_path_edges_)
+	{
+		g_[ei].critical = true;
 	}
 }
 
