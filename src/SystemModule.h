@@ -30,8 +30,14 @@ private:
 	// helper function adds energies for submodules
 	void recordEnergies(std::map<delay_t,energy_t>& energyTable) const;
 
+	// vertices of modules that are directly connected to system inputs
+	std::vector<vertex_t> root_vertices_;
+	
 	// map module to vertex descriptor
 	std::map<Module*, vertex_t> vertex_descriptor_of_;
+
+	// map vertex descriptor to module
+	std::map<vertex_t, Module*> module_of_descriptor_;
 
 	// an edge in the graph is uniquely defined by source and destination modules + ports
 	// map <source module, source port name, destination module, destination port name>to edge property
@@ -41,8 +47,14 @@ private:
 	// connect vertices of system module submodules
 	void connect_submodule_vertices();
 
+	// update signal arrival times at each edge via dfs graph traversal
+	void update_graph_timestamps();
+
 	// label the connections between modules in the graph visualization
 	void label_edges();
+
+	// set all the timestamps in the graphical representation of the circuit
+	void timestamps_dfs(vertex_t node, std::map<vertex_t, bool> path, int t, std::vector<int> inums);
 
 public:
 	// overridden from Module

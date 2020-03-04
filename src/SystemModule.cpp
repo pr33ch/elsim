@@ -10,12 +10,89 @@
 void SystemModule::visualize()
 {
 	connect_submodule_vertices();
-	// TO-DO: method for updating time delays -- BFS
+	//update time delays via DFS through g_
+	update_graph_timestamps();
 	// TO-DO: method for highlighting cricial path -- DFS
 	label_edges();
 	write_graphviz(std::cout, g_,
 	            make_label_writer(get(&VertexProps::name, g_)),
 	            make_label_writer(get(&EdgeProps::label, g_)));
+}
+
+void SystemModule::timestamps_dfs(vertex_t node, std::map<vertex_t, bool> path, int t, std::vector<int> inums)
+{
+
+	// std::cout << t << std::endl;
+	if (path[node] == false && out_degree(node, g_) > 0) // if we haven't visited the node already and the node is not a leaf node
+	{
+		// std::cout << "HELLO" << std::endl;
+		path[node] = true; // mark the node as visited
+
+		// traverse the sub graph in dfs fashion, updating the timestamps of the EdgeProperties accordingly
+		boost::graph_traits < Graph >::out_edge_iterator ei, ei_end;
+
+		// iterate through all of the outgoing edges of the node
+		for (boost::tie(ei, ei_end) = out_edges(node, g_); ei != ei_end; ++ei) 
+		{
+			auto source = boost::source ( *ei, g_ );
+			auto target = boost::target ( *ei, g_ );
+
+			if (edge_properties_of_descriptor_.count(*ei) != 0)
+			{
+				EdgeProperties* ep = edge_properties_of_descriptor_[*ei];
+				// calculate the maximum delay that a signal would arrive at the given edge ei
+				delay_t max_dt = 0;
+				delay_t dt = 0;
+				if (inums.size() > 0)
+				{
+					for (size_t k = 0; k < inums.size(); k++)
+					{
+						for (size_t i = 0; i < ep->source_bit_positions_.size(); i++)
+						{
+							Module* m = module_of_descriptor_[source];
+							dt = m->delay(inums[k], ep->source_bit_positions_[i]);
+							if (dt > max_dt)
+							{
+								max_dt = dt;
+							}
+						}
+					}
+					// std::cout << max_dt << std::endl;
+					// update the delay through the edge if t+max_dt is greater than the delay marked at the edge
+					ep->t_ = std::max(max_dt + t, ep->t_);
+					// std::cout << ep->t_ << std::endl;
+				}
+				// recursively do this for the destination node
+				timestamps_dfs(target, path, max_dt+t, ep->dest_bit_positions_);
+			}
+		}
+		path[node] = false; // backtrack our visit
+	}
+}
+
+void SystemModule::update_graph_timestamps()
+{
+	std::map<vertex_t, bool> path;
+	// iterate through each vertex, marking all vertices as unvisited
+	boost::graph_traits<Graph>::vertex_iterator vi, vi_end, next;
+	boost::tie(vi, vi_end) = vertices(g_);
+	for (next = vi; vi != vi_end; vi = next) 
+	{
+		path[*next] = false;
+		next++;
+	}
+
+	for (auto& root : root_vertices_)
+	{	
+		int inWidth = module_of_descriptor_[root]->numInputs();
+		// std::cout << inWidth << std::endl;
+		std::vector<int> inums;
+		for (int i = 0; i < inWidth; i++)
+		{
+			 inums.push_back(i);
+		}
+		timestamps_dfs(root, path, 0, inums);
+	}
 }
 
 void SystemModule::label_edges()
@@ -228,9 +305,7 @@ std::cout << "w2 has writer! " << *(w2->getWriter().first) << std::endl;
 	// update graph representation of circuit
 	if (m->nameOfInput(inum).name.length() != 0)
 	{
-		// int sWidth = (*this)(nameOfInput(i).name).width(); // bit width of source port
-		// int dWidth = (*m)(m->nameOfInput(inum).name).width();
-		// std::string label = "SRC: " + nameOfInput(i).name + "[" + std::to_string(i%sWidth) + "]\n" + "DEST: " + m->nameOfInput(inum).name + "[" + std::to_string(inum%dWidth) + "]\n" + "T: 0";
+		root_vertices_.push_back(vertex_descriptor_of_[m]);
 		std::string label = "SRC: " + nameOfInput(i).name + "[" + std::to_string(i) + "]\n" + "DEST: " + m->nameOfInput(inum).name + "[" + std::to_string(inum) + "]\n" + "T: 0";
 		add_edge(iovertex_descriptor_of_[nameOfInput(i).name], vertex_descriptor_of_[m], {label}, g_);
 	}
@@ -367,6 +442,8 @@ void SystemModule::submodule(Module* m)
 	vertex_t u = add_vertex(g_);
 	g_[u].name = m->classname_;
 	vertex_descriptor_of_[m] = u;
+	module_of_descriptor_[u] = m;
+
 #ifdef MOD_EXTRA
 	assert(!m->parent);
 	m->parent = this;

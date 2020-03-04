@@ -3,6 +3,7 @@
 
 #include <boost/graph/adjacency_list.hpp>
 #include <boost/graph/graphviz.hpp>
+#include "BitHistory.h"
 
 struct VertexProps { std::string name; };
 struct EdgeProps   { std::string label; };
@@ -24,7 +25,7 @@ class EdgeProperties
 		std::vector<int> dest_bit_positions_;
 
 		// time stamp at which signals arrive at dest
-		int t_ = 0;
+		delay_t t_ = 0;
 
 		// marked red in dot file if true
 		bool critical_ = false;
