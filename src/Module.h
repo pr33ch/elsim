@@ -56,6 +56,9 @@ protected:
 
 	// adjacency-list representation of circuit where modules are nodes of the graph
 	Graph g_;
+
+	std::vector<vertex_t> root_vertices_;
+
 	// map input/output names to vertex descriptor
 	std::map<std::string, vertex_t> iovertex_descriptor_of_;
 	

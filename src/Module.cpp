@@ -148,6 +148,7 @@ void Module::addInput(const std::string& name, int N)
 	vertex_t u = add_vertex(g_);
 	g_[u].name = name;
 	iovertex_descriptor_of_[name] = u;
+	root_vertices_.push_back(u);
 	int Nin = numInputs();
 	addInputs(N);
 	defineInput(name, Nin+N-1, Nin);

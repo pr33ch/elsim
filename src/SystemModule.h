@@ -29,10 +29,10 @@ private:
 
 	// helper function adds energies for submodules
 	void recordEnergies(std::map<delay_t,energy_t>& energyTable) const;
-
-	// vertices of modules that are directly connected to system inputs
-	std::vector<vertex_t> root_vertices_;
 	
+	// map edges connecting root nodes to destination module port numbers
+	std::map<edge_t, std::vector<int>> system_input_destination_ports_of_;
+
 	// map module to vertex descriptor
 	std::map<Module*, vertex_t> vertex_descriptor_of_;
 

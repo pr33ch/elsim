@@ -65,6 +65,10 @@ void SystemModule::timestamps_dfs(vertex_t node, std::map<vertex_t, bool> path, 
 				// recursively do this for the destination node
 				timestamps_dfs(target, path, max_dt+t, ep->dest_bit_positions_);
 			}
+			else
+			{
+				timestamps_dfs(target, path, 0, system_input_destination_ports_of_[*ei]);
+			}
 		}
 		path[node] = false; // backtrack our visit
 	}
@@ -84,13 +88,13 @@ void SystemModule::update_graph_timestamps()
 
 	for (auto& root : root_vertices_)
 	{	
-		int inWidth = module_of_descriptor_[root]->numInputs();
+		// int inWidth = module_of_descriptor_[root]->numInputs();
 		// std::cout << inWidth << std::endl;
 		std::vector<int> inums;
-		for (int i = 0; i < inWidth; i++)
-		{
-			 inums.push_back(i);
-		}
+		// for (int i = 0; i < inWidth; i++)
+		// {
+		// 	 inums.push_back(i);
+		// }
 		timestamps_dfs(root, path, 0, inums);
 	}
 }
@@ -305,9 +309,9 @@ std::cout << "w2 has writer! " << *(w2->getWriter().first) << std::endl;
 	// update graph representation of circuit
 	if (m->nameOfInput(inum).name.length() != 0)
 	{
-		root_vertices_.push_back(vertex_descriptor_of_[m]);
 		std::string label = "SRC: " + nameOfInput(i).name + "[" + std::to_string(i) + "]\n" + "DEST: " + m->nameOfInput(inum).name + "[" + std::to_string(inum) + "]\n" + "T: 0";
-		add_edge(iovertex_descriptor_of_[nameOfInput(i).name], vertex_descriptor_of_[m], {label}, g_);
+		auto e = add_edge(iovertex_descriptor_of_[nameOfInput(i).name], vertex_descriptor_of_[m], {label}, g_).first;
+		system_input_destination_ports_of_[e].push_back(inum);
 	}
 }
 
