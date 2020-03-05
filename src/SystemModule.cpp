@@ -50,6 +50,7 @@ void SystemModule::timestamps_dfs(vertex_t node, std::map<vertex_t, bool> path, 
 						{
 							Module* m = module_of_descriptor_[source];
 							dt = m->delay(inums[k], ep->source_bit_positions_[i]);
+							dt += m->fanout(ep->source_bit_positions_[i]);
 							if (dt > max_dt)
 							{
 								max_dt = dt;
