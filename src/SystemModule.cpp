@@ -1,6 +1,7 @@
 #ifdef DEBUG
 #include <iostream>
 #endif
+#include <fstream>
 #include <cstdarg>
 #include <queue>
 #include "SystemModule.h"
@@ -9,13 +10,16 @@
 
 void SystemModule::visualize()
 {
+	std::ofstream myfile;
+	myfile.open (classname_ + ".gv");
 	connect_submodule_vertices();
 	//update time delays via DFS through g_, find critical path edges along the way
 	update_graph_timestamps();
 	label_edges(); // label + color edges
-	write_graphviz(std::cout, g_,
+	write_graphviz(myfile, g_,
 	            make_label_writer(get(&VertexProps::name, g_)),
 	            my_edge_property_writer( g_));
+	myfile.close();
 }
 
 void SystemModule::timestamps_dfs(vertex_t node, std::map<vertex_t, bool> path, std::vector<edge_t> &edge_path, int t, std::vector<int> inums)
