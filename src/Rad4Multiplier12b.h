@@ -57,9 +57,10 @@ private:
 			IN("Y", 2*i) >> parallel_recoder("y2j");
 			IN("Y", 2*i + 1) >> parallel_recoder("y2j+1");
 
-			IN("X") >> parallel_recoder("Xi");
+			// IN("X") >> parallel_recoder("Xi");
 
-			parallel_recoder("Xo") >> multiple_generator("X");
+			// parallel_recoder("Xo") >> multiple_generator("X");
+			IN("X") >> multiple_generator("X");
 			parallel_recoder("sign") >> multiple_generator("sign");
 			parallel_recoder("one") >> multiple_generator("one");
 			parallel_recoder("two") >> multiple_generator("two");	

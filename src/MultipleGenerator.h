@@ -86,7 +86,7 @@ class MultipleGenerator : public Module
 			{
 				OUT("pp") <= NotXshifted;
 			}
-			else
+			else if (two.bit == 0 && sign.bit == 0)
 			{
 				OUT("pp") <= 0;
 			}

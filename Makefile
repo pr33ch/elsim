@@ -1,12 +1,12 @@
 .PHONY: all opt debug clean
 
-MAINSRC := test/adders.cpp
+# MAINSRC := test/adders.cpp
 #MAINSRC := test/addtests.cpp
 #MAINSRC := test/addtests2.cpp
 #MAINSRC := test/perftest.cpp
 #MAINSRC := test/prefix8to128.cpp
 #MAINSRC := test/cla8to128.cpp
-# MAINSRC := test/mult_test.cpp
+MAINSRC := test/mult_test.cpp
 # MAINSRC := test/multgen_test.cpp
 
 SRC := src/Bit.cpp src/BitVector.cpp src/Module.cpp src/SystemModule.cpp src/EdgeProperties.cpp
