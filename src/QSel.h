@@ -32,8 +32,8 @@ class QSel : public Module
 			BitVector s = IN("WS");
 			BitVector p = c^s;
 			BitVector g = c&s;
-			OUT("qs") <= (p.get(0) ^ (g.get(1) | (p.get(1) & g.get(2)) | (p.get(1) & p.get(2) & g.get(3))));
-			OUT("qm") <= ~(p.get(1) & p.get(2) & p.get(3));
+			OUT("qs") <= (p.get(3) ^ (g.get(2) | (p.get(2) & g.get(1)) | (p.get(2) & p.get(1) & g.get(0))));
+			OUT("qm") <= ~(p.get(2) & p.get(1) & p.get(0));
 		}
 
 		delay_t delay(int inum, int onum)
