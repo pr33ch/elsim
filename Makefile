@@ -9,7 +9,8 @@
 # MAINSRC := test/mult_test.cpp
 # MAINSRC := test/multgen_test.cpp
 # MAINSRC := test/test_qsel.cpp
-MAINSRC := test/test_mux4to1.cpp
+# MAINSRC := test/test_mux4to1.cpp
+MAINSRC := test/test_qconv.cpp
 
 SRC := src/Bit.cpp src/BitVector.cpp src/Module.cpp src/SystemModule.cpp src/EdgeProperties.cpp
 

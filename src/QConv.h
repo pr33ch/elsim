@@ -1,7 +1,7 @@
 #ifndef QConv_H_
 #define QConv_H_
 
-#define QCONV_DELAY 25
+#define QCONV_DELAY 25*DELAY_NAND(2)
 
 #include <math.h>
 #include "Module.h"
@@ -12,6 +12,7 @@ class QConv : public Module
 {
 	private:
 		size_t width_;
+		bool test_;
 		unsigned int q_ = 0;
 
 		bool neg_w(BitVector ws, BitVector wc) // check if w is negative
@@ -72,12 +73,14 @@ class QConv : public Module
 			}
 		}
 	public: 
-		QConv(size_t N)
+		QConv(size_t N, bool test=false)
 		{
 			std::stringstream ss;
 			ss << "QConv";
 			classname_ = ss.str();
 			width_ = N;
+
+			test_ = test;
 
 			addInput("CLK");
 			addInput("q", 2); // sign and magnitude inputs for q: (sign, magnitude)
@@ -89,10 +92,10 @@ class QConv : public Module
 
 		void propagate()
 		{
-			if (posedge("CLK"))
+			if (posedge("CLK") || test_)
 			{
-				Bit sign = IN("q", 0);
-				Bit magnitude = IN("q", 1);
+				Bit magnitude = IN("q", 0);
+				Bit sign = IN("q", 1);
 				BitVector ws = IN("WS");
 				BitVector wc = IN("WC");
 
