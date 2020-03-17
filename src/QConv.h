@@ -71,6 +71,7 @@ class QConv : public Module
 				}
 				tempQN >>= 1;
 			}
+			std::cout << "iterative QN: " << OUT("QN") << std::endl;
 		}
 	public: 
 		QConv(size_t N, bool test=false)
@@ -155,7 +156,7 @@ class QConv : public Module
 
 		area_t area() const
 		{
-			return 1360; // according to figure 5.5 in Digital Arithmetic, pp. 265 section 5.3.1	
+			return 1360*AREA_NAND(2); // according to figure 5.5 in Digital Arithmetic, pp. 265 section 5.3.1	
 		}
 };
 

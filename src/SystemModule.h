@@ -43,6 +43,10 @@ private:
 	// map vertex descriptor to module
 	std::map<vertex_t, Module*> module_of_descriptor_;
 
+	// keep track of connections that will eventually cause back edges in the graph -- user's responsibility
+	std::map<std::tuple<Module*, std::string, Module*, std::string>, bool> cyclic_connection_;
+	std::map<edge_t, bool> back_edge_;
+
 	// an edge in the graph is uniquely defined by source and destination modules + ports
 	// map <source module, source port name, destination module, destination port name>to edge property
 	std::map<std::tuple<Module*, std::string, Module*, std::string>, EdgeProperties*> edge_properties_of_components_;
@@ -58,7 +62,7 @@ private:
 	void label_edges();
 
 	// set all the timestamps in the graphical representation of the circuit
-	void timestamps_dfs(vertex_t node, std::map<vertex_t, bool> path, std::vector<edge_t> &edge_path, int t, std::vector<int> inums);
+	void timestamps_dfs(vertex_t node, std::map<vertex_t, bool> &path, std::vector<edge_t> &edge_path, int t, std::vector<int> inums);
 
 public:
 	// overridden from Module
@@ -84,6 +88,10 @@ public:
 
 	// export a dot file that visualizes the circuit via computational graph
 	void visualize(); // TO-DO: argument should be a custom path?
+
+	// register a connection as cyclic
+	void cyclic_connection(int src_port_num, Module* src_module, int dest_port_num, Module* dest_module);
+	void cyclic_connection(std::string src_port_name, Module* src_module, std::string dest_port_name, Module* dest_module);
 
 protected:
 	// overridden from Module

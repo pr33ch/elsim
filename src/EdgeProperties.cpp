@@ -56,7 +56,15 @@ std::string EdgeProperties::to_str()
 
 	std::string s = "SRC: " + source_port_ + "[" + sbp.str() + "]" + "\n";
 	s += "DEST: " + dest_port_ + "[" + dbp.str() + "]" + "\n";
-	s += "T: " + std::to_string(t_);
+
+	if (t_ >= 0)
+	{
+		s += "T: " + std::to_string(t_);
+	}
+	else
+	{
+		s += "T: Cyclic";
+	}
 
 	return s;
 }

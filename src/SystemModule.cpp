@@ -22,7 +22,7 @@ void SystemModule::visualize()
 	myfile.close();
 }
 
-void SystemModule::timestamps_dfs(vertex_t node, std::map<vertex_t, bool> path, std::vector<edge_t> &edge_path, int t, std::vector<int> inums)
+void SystemModule::timestamps_dfs(vertex_t node, std::map<vertex_t, bool>& path, std::vector<edge_t> &edge_path, int t, std::vector<int> inums)
 {
 
 	// std::cout << t << std::endl;
@@ -37,6 +37,15 @@ void SystemModule::timestamps_dfs(vertex_t node, std::map<vertex_t, bool> path, 
 		// iterate through all of the outgoing edges of the node
 		for (boost::tie(ei, ei_end) = out_edges(node, g_); ei != ei_end; ++ei) 
 		{
+			if (back_edge_[*ei])
+			{
+				if (edge_properties_of_descriptor_.count(*ei) != 0)
+				{
+					edge_properties_of_descriptor_[*ei]->t_ = -1; // set the timestamp for this edge as -1 for a cyclic back-edge. Edgeproperties will recognize this and fill in "Cyclic" for the T label
+				}
+				continue;
+			}
+
 			auto source = boost::source ( *ei, g_ );
 			auto target = boost::target ( *ei, g_ );
 
@@ -78,7 +87,7 @@ void SystemModule::timestamps_dfs(vertex_t node, std::map<vertex_t, bool> path, 
 				edge_path.pop_back();
 			}
 		}
-		path[node] = false; // backtrack our visit
+		path[node] = false; // backtrack our visit	
 	}
 	else // we've reached a leaf node
 	{
@@ -135,6 +144,20 @@ void SystemModule::label_edges()
 	}
 }
 
+void SystemModule::cyclic_connection(int src_port_num, Module* src_module, int dest_port_num, Module* dest_module)
+{
+	std::string src_port_name = src_module->nameOfOutput(src_port_num).name;
+	std::string dest_port_name = dest_module->nameOfInput(dest_port_num).name;
+	std::tuple<Module*, std::string, Module*, std::string> key = std::make_tuple(src_module, src_port_name, dest_module, dest_port_name);
+	cyclic_connection_[key] = true;
+}
+
+void SystemModule::cyclic_connection(std::string src_port_name, Module* src_module, std::string dest_port_name, Module* dest_module)
+{
+	std::tuple<Module*, std::string, Module*, std::string> key = std::make_tuple(src_module, src_port_name, dest_module, dest_port_name);
+	cyclic_connection_[key] = true;	
+}
+
 void SystemModule::connect_submodule_vertices()
 {
  
@@ -173,6 +196,11 @@ void SystemModule::connect_submodule_vertices()
 						ep->define_bit_position_connection(src_port_num, dest_port_num);
 						edge_properties_of_descriptor_[e] = ep;
 						edge_properties_of_components_[key] = ep;
+
+						if (cyclic_connection_[key])
+						{
+							back_edge_[e] = true;
+						}
 					}
 					else
 					{
