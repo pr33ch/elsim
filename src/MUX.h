@@ -29,7 +29,7 @@ public:
 	void propagate()
 	{
 		Bit sel = IN("SEL");
-
+		// std::cout << "MUX: " << IN("A") << " or " << IN("B") << std::endl;
 		if (sel == LOW)
 			OUT("Z") <= IN("A");
 		else if (sel == HIGH)

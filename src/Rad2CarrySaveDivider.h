@@ -16,9 +16,10 @@ class Rad2CarrySaveDivider : public SystemModule
 {
 	private:
 		int n_;
+		delay_t T_;
 		void initSubmodules()
 		{
-			clk_ = new CLK(n_, 250,250);
+			clk_ = new CLK(n_+2, T_/2, T_/2);
 			submodule(clk_);
 
 			reg_d_ = new REG(n_);
@@ -51,7 +52,7 @@ class Rad2CarrySaveDivider : public SystemModule
 			qconv_ = new QConv(n_);
 			submodule(qconv_);
 
-			input_ctrl_ = new InputCtrl();
+			input_ctrl_ = new InputCtrl(T_);
 			submodule(input_ctrl_);
 		}
 
@@ -128,9 +129,10 @@ class Rad2CarrySaveDivider : public SystemModule
 		QConv* qconv_;
 		InputCtrl* input_ctrl_;
 
-		Rad2CarrySaveDivider(int N, int d)
+		Rad2CarrySaveDivider(int N, int d, delay_t clk_period)
 		{
 			n_ = N;
+			T_ = clk_period;
 			addInput("d", N);
 			addInput("WC", N);
 			addInput("WS", N);

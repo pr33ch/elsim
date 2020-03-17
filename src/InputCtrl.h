@@ -9,9 +9,11 @@ class InputCtrl : public Module
 {
 private:
 	bool first_clk_ = true;
+	delay_t T_;
 public:
-	InputCtrl()
+	InputCtrl(delay_t clk_period)
 	{
+		T_ = clk_period;
 		addInput("CLK");
 
 		addOutput("CTRL");
@@ -27,12 +29,14 @@ public:
 		{
 			if (first_clk_)
 			{
-				OUT("CTRL") <= Bit(LOW);
+				// OUT("CTRL") <= Bit(LOW);
+				setOutput(0, Bit(LOW), 1);
 				first_clk_ = false;
 			}
 			else
 			{
-				OUT("CTRL") <= Bit(HIGH);
+				// OUT("CTRL") <= Bit(HIGH);
+				setOutput(0, Bit(HIGH), 1);
 			}
 		}
 	}

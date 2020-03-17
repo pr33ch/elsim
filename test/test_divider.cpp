@@ -7,7 +7,7 @@
 using namespace std;
 void testDivider(unsigned int x, int d) // magnitude of ws and wc must be <= 4 bits
 {
-	Rad2CarrySaveDivider divider(4, d);
+	Rad2CarrySaveDivider divider(4, d, 1000);
 
 	// set inputs and simulate
 	divider("d") <= d;
@@ -16,13 +16,7 @@ void testDivider(unsigned int x, int d) // magnitude of ws and wc must be <= 4 b
 	cout<< "input WS: ." << divider("WS") << endl;
 	cout<< "input WC: ." << divider("WC") << endl;
 	cout<< "input d: ." << divider("d") << endl;
-
-	MSET_T roots;
-	roots.insert(&divider);
-	roots.insert(divider.clk_);
-	divider.simStart(roots);
-	cout << "Q: ." << divider("Q") << endl;
-
+	divider.clk_->simulate();
 	divider.visualize();
 }
 

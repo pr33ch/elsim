@@ -46,9 +46,11 @@ class QConv : public Module
 			}
 			else
 			{
+				std::cout << "positive y" << std::endl;
 				tempQN = q_;
 			}
-
+			std::cout << "stored Q: " << q_ << std::endl;
+			std::cout << "stored QN: " << tempQN << std::endl;
 			for (size_t i = 0; i < width_; i++)
 			{
 				if (temp & 1)
@@ -71,7 +73,7 @@ class QConv : public Module
 				}
 				tempQN >>= 1;
 			}
-			std::cout << "iterative QN: " << OUT("QN") << std::endl;
+			// std::cout << "iterative QN: " << OUT("QN") << std::endl;
 		}
 	public: 
 		QConv(size_t N, bool test=false)
@@ -95,6 +97,11 @@ class QConv : public Module
 		{
 			if (posedge("CLK") || test_)
 			{
+				std::cout << "......qconv......" << std::endl;
+				std::cout << "q: " << IN("q") << std::endl;
+				std::cout << "WS: " << IN("WS") << std::endl;
+				std::cout << "WC: " << IN("WC") << std::endl;
+
 				Bit magnitude = IN("q", 0);
 				Bit sign = IN("q", 1);
 				BitVector ws = IN("WS");
@@ -118,6 +125,7 @@ class QConv : public Module
 					q_ |= 1;
 					connect_output(neg_w(ws, wc));
 				}
+				std::cout << "................." << std::endl;
 			}
 		}
 

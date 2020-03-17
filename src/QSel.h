@@ -27,6 +27,8 @@ class QSel : public Module
 
 		void propagate()
 		{
+			std::cout << "qsel in: " << IN("WS") << " " << IN("WC") << std::endl;
+			std::cout << "qsel out: ";
 			// from example 5.2, section 5.5 in Digital Arithmetic:
 			BitVector c = IN("WC");
 			BitVector s = IN("WS");
@@ -34,6 +36,7 @@ class QSel : public Module
 			BitVector g = c&s;
 			OUT("qs") <= (p.get(3) ^ (g.get(2) | (p.get(2) & g.get(1)) | (p.get(2) & p.get(1) & g.get(0))));
 			OUT("qm") <= ~(p.get(2) & p.get(1) & p.get(0));
+			std::cout << OUT("qs") << " " << OUT("qm") << std::endl;
 		}
 
 		delay_t delay(int inum, int onum)
