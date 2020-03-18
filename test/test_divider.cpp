@@ -18,6 +18,7 @@ void testDivider(unsigned int x, int d) // magnitude of ws and wc must be <= 4 b
 	cout<< "input d: ." << divider("d") << endl;
 	divider.clk_->simulate();
 	divider.visualize();
+	cout << "Area: " << divider.area() << endl;
 }
 
 int main(int argc, char** argv)
